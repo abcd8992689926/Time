@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from Models.BaseRequest import BaseRequest
+from Models.Message.BaseRequest import BaseRequest
 
 
 @dataclass
