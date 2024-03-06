@@ -3,6 +3,6 @@ from dataclasses import dataclass
 from Models.Message.BaseRequest import BaseRequest
 
 
-@dataclass
+@dataclass(slots=True, kw_only=True)
 class PushRequest(BaseRequest):
     to: str

@@ -4,7 +4,7 @@ from typing import TypeVar, List
 TMessageType = TypeVar('TMessageType')
 
 
-@dataclass
+@dataclass(slots=True, kw_only=True)
 class BaseRequest:
     XLineRetryKey: str
     messages: List[TMessageType]
