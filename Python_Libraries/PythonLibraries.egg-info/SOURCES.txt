@@ -1,7 +1,0 @@
-setup.py
-File/Json.py
-File/__init__.py
-PythonLibraries.egg-info/PKG-INFO
-PythonLibraries.egg-info/SOURCES.txt
-PythonLibraries.egg-info/dependency_links.txt
-PythonLibraries.egg-info/top_level.txt

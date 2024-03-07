@@ -1,5 +1,6 @@
+import sys
 from dataclasses import dataclass
-from Python_Libraries import File
+
 
 @dataclass(slots=True, kw_only=True)
 class MessageAPIConfig:
@@ -8,5 +9,6 @@ class MessageAPIConfig:
     Multicast: str
     ChannelAccessToken: str
 
-def test():
-    PythonLibraries.Json
+
+if __name__ == '__main__':
+    load_config_as_model
