@@ -4,5 +4,5 @@ setup(
     name='python_common',
     version='1.0',
     description='',
-    packages=find_packages()
+    packages=['file']
 )
