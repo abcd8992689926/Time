@@ -1,0 +1,6 @@
+{
+  "ServerURL": "https://api.line.me/v2/bot",
+  "Push": "/message/push",
+  "Multicast": "/message/multicast",
+  "ChannelAccessToken": "u2EdOph7HU53+CVCtRzSmC3gqeiGRgl1jHIFemrcfsECRVVixcGh4GwIH/a3KPup8GFHULji8nAZ3jYHBqhFK7d3JKWA3qpj6G/ak9j9KXMVRaQtsCHUKZNOgOW1/guyIMVg87YtGsZvpD9iNxIeZAdB04t89/1O/w1cDnyilFU="
+}

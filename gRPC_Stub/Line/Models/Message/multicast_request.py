@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from Models.Message.BaseRequest import BaseRequest
+from models.message.base_request import BaseRequest
 
 
 @dataclass(slots=True, kw_only=True)

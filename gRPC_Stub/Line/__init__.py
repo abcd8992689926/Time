@@ -1,11 +1,10 @@
-import os
 import sys
 
-from Models.Config.MessageAPIConfig import MessageAPIConfig
+from models.config.message_api_config import MessageAPIConfig
 
 sys.path.append('..\..\Libraries\python_common')
 
-import file
+from file.json import Json
 
-test = file.json.load_config_as_model("test", MessageAPIConfig)
+test = Json.load_config_as_model("config/message_api_config.json", MessageAPIConfig)
 print(test)
