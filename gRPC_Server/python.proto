@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option cc_generic_services = true;
+
+//定義服務介面
+service GrpcService {
+    rpc hello (HelloRequest) returns (HelloResponse) {}  //一個服務中可以定義多個介面，也就是多個函式功能
+}
+//請求的引數
+message HelloRequest {
+    string data = 1;   //數字1,2是引數的位置順序，並不是對引數賦值
+    Skill skill = 2;  //支援自定義的資料格式，非常靈活
+};
+//返回的物件
+message HelloResponse {
+    string result = 1;
+    map<string, int32> map_result = 2; //支援map資料格式，類似dict
+};
+message Skill {
+    string name = 1;
+};
