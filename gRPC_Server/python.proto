@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option cc_generic_services = true;
 
-import "../messages/line/push_message.proto";
+import "messages/line/push_message.proto";
 
 service GrpcService {
     rpc LinePushMessage (LinePushMessageRequest) returns (LinePushMessageResponse) {}
