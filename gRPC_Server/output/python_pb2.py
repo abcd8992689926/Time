@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from messages.line import push_message_pb2 as messages_dot_line_dot_push__message__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cpython.proto\x1a messages/line/push_message.proto2U\n\x0bGrpcService\x12\x46\n\x0fLinePushMessage\x12\x17.LinePushMessageRequest\x1a\x18.LinePushMessageResponse\"\x00\x42\x03\x80\x01\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cpython.proto\x12\x0bgRPC_Server\x1a messages/line/push_message.proto2y\n\x0bGrpcService\x12j\n\x0fLinePushMessage\x12).line.push_message.LinePushMessageRequest\x1a*.line.push_message.LinePushMessageResponse\"\x00\x42\x03\x80\x01\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,6 +23,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'python_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'\200\001\001'
-  _globals['_GRPCSERVICE']._serialized_start=50
-  _globals['_GRPCSERVICE']._serialized_end=135
+  _globals['_GRPCSERVICE']._serialized_start=63
+  _globals['_GRPCSERVICE']._serialized_end=184
 # @@protoc_insertion_point(module_scope)

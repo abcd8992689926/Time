@@ -15,7 +15,7 @@ class GrpcServiceStub(object):
             channel: A grpc.Channel.
         """
         self.LinePushMessage = channel.unary_unary(
-                '/GrpcService/LinePushMessage',
+                '/gRPC_Server.GrpcService/LinePushMessage',
                 request_serializer=messages_dot_line_dot_push__message__pb2.LinePushMessageRequest.SerializeToString,
                 response_deserializer=messages_dot_line_dot_push__message__pb2.LinePushMessageResponse.FromString,
                 )
@@ -40,7 +40,7 @@ def add_GrpcServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'GrpcService', rpc_method_handlers)
+            'gRPC_Server.GrpcService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -59,7 +59,7 @@ class GrpcService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/GrpcService/LinePushMessage',
+        return grpc.experimental.unary_unary(request, target, '/gRPC_Server.GrpcService/LinePushMessage',
             messages_dot_line_dot_push__message__pb2.LinePushMessageRequest.SerializeToString,
             messages_dot_line_dot_push__message__pb2.LinePushMessageResponse.FromString,
             options, channel_credentials,

@@ -4,6 +4,8 @@ option cc_generic_services = true;
 
 import "messages/line/push_message.proto";
 
+package gRPC_Server;
+
 service GrpcService {
-    rpc LinePushMessage (LinePushMessageRequest) returns (LinePushMessageResponse) {}
+    rpc LinePushMessage (line.push_message.LinePushMessageRequest) returns (line.push_message.LinePushMessageResponse) {}
 }
