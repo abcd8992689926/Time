@@ -7,8 +7,7 @@ from file.json import Json
 
 
 class MessageAPI:
-    def __init__(self):
-        mod_config = Json.load_config_as_model("../config/message_api_config.json", MessageAPIConfig)
+    def __init__(self, mod_config: MessageAPIConfig):
         self._str_push_url = mod_config.ServerURL + mod_config.Push
         self._str_multicast_url = mod_config.ServerURL + mod_config.Multicast
         self._obj_header = {"Authorization": "Bearer " + mod_config.ChannelAccessToken}
@@ -33,7 +32,8 @@ class MessageAPI:
 
 
 if __name__ == "__main__":
-    message_api = MessageAPI()
+    mod_config = Json.load_config_as_model("../config/message_api_config.json", MessageAPIConfig)
+    message_api = MessageAPI(mod_config)
     message_api.push_text_message(
         to="U6cefe412bc8a0fd54cf1d4b3465cba30",
         messages=[TextMessage(text="testText1")]

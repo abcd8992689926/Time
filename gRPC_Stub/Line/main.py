@@ -1,32 +1,38 @@
+import sys
+import time
+from concurrent import futures
 from typing import List
 
+import grpc
 from linebot.v3.messaging import TextMessage
-from output import python_pb2_grpc, python_pb2
 
+if __name__ == '__main__':
+    sys.path.append('..\..\gRPC_Server')
+from src.generated import line_service_pb2_grpc, line_service_pb2, push_message_pb2
+from file.json import Json
 from factories.message_api import MessageAPI
+from models.config.message_api_config import MessageAPIConfig
+
+_ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
-class TestService(python_pb2_grpc.GrpcServiceServicer):
+class TestService(line_service_pb2_grpc.LineServiceServicer):
     def __init__(self):
         pass
 
-    def LinePushMessage(self, request: python_pb2.LinePushMessageRequest):
-        MessageAPI().push_text_message(
+    def PushMessage(self, request: push_message_pb2.PushMessageRequest, context):
+        mod_config = Json.load_config_as_model("./config/message_api_config.json", MessageAPIConfig)
+        print(request.text)
+        MessageAPI(mod_config).push_text_message(
             to=request.to,
             messages=[TextMessage(text=item) for item in request.text]
         )
-        result = request.data + request.skill.name + " this is gprc test service"
-        list_result = {"12": 1232}
-        return python_pb2.LinePushMessageResponse()
+        return push_message_pb2.PushMessageResponse(status=True)
 
 
 def run():
-    '''
-    模擬服務啟動
-    :return:
-    '''
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    hello_pb2_grpc.add_GrpcServiceServicer_to_server(TestService(), server)
+    line_service_pb2_grpc.add_LineServiceServicer_to_server(TestService(), server)
     server.add_insecure_port('[::]:50052')
     server.start()
     print("start service...")

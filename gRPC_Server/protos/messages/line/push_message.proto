@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package line.push_message;
+package line;
 
-message LinePushMessageRequest {
+message PushMessageRequest {
     string to = 1;
     repeated string text = 2;
 };
 
-message LinePushMessageResponse {
+message PushMessageResponse {
     bool status = 1;
 };
