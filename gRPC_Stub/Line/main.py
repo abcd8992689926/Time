@@ -1,3 +1,4 @@
+import logging
 import sys
 import time
 from concurrent import futures
@@ -5,6 +6,8 @@ from typing import List
 
 import grpc
 from linebot.v3.messaging import TextMessage
+from seqlog import SeqLogHandler
+from pygelf import GelfUdpHandler
 
 if __name__ == '__main__':
     sys.path.append('..\..\gRPC_Server')
@@ -20,7 +23,8 @@ class TestService(line_service_pb2_grpc.LineServiceServicer):
     def __init__(self):
         pass
 
-    def PushMessage(self, request: push_message_pb2.PushMessageRequest, context):
+    def PushMessage(self, request: push_message_pb2.PushMessageRequest,
+                    context) -> push_message_pb2.PushMessageResponse:
         mod_config = Json.load_config_as_model("./config/message_api_config.json", MessageAPIConfig)
         print(request.text)
         MessageAPI(mod_config).push_text_message(
@@ -44,4 +48,9 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    # run()
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger()
+    logger.addHandler(GelfUdpHandler(host='127.0.0.1', port=5341))
+    logger.info('Hello, Seq+GELF!')
+
