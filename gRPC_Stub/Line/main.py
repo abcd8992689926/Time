@@ -6,8 +6,7 @@ from typing import List
 
 import grpc
 from linebot.v3.messaging import TextMessage
-from seqlog import SeqLogHandler
-from pygelf import GelfUdpHandler
+from fluent import sender
 
 if __name__ == '__main__':
     sys.path.append('..\..\gRPC_Server')
@@ -49,8 +48,9 @@ def run():
 
 if __name__ == '__main__':
     # run()
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger()
-    logger.addHandler(GelfUdpHandler(host='127.0.0.1', port=5341))
-    logger.info('Hello, Seq+GELF!')
-
+    logger = sender.FluentSender('myapp', host='localhost', port=24224)
+    # 寫入日誌
+    tmp = logger.emit('my_tag', {'key1': 'value1', 'key2': 'value2'})
+    print(tmp)
+    # 最後別忘了關閉
+    logger.close()
