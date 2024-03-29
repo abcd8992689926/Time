@@ -18,7 +18,7 @@ from models.config.message_api_config import MessageAPIConfig
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
-class TestService(line_service_pb2_grpc.LineServiceServicer):
+class LineService(line_service_pb2_grpc.LineServiceServicer):
     def __init__(self):
         pass
 
@@ -35,9 +35,10 @@ class TestService(line_service_pb2_grpc.LineServiceServicer):
 
 def run():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    line_service_pb2_grpc.add_LineServiceServicer_to_server(TestService(), server)
+    line_service_pb2_grpc.add_LineServiceServicer_to_server(LineService(), server)
     server.add_insecure_port('[::]:50052')
     server.start()
+
     print("start service...")
     try:
         while True:
@@ -47,10 +48,10 @@ def run():
 
 
 if __name__ == '__main__':
+    print(sys.path)
+    from __init__ import systemLogger
+
+    systemLogger.emit('test2', {'key1': 'value1', 'key2': 'value2'})
     # run()
-    logger = sender.FluentSender('myapp', host='localhost', port=24224)
-    # 寫入日誌
-    tmp = logger.emit('my_tag', {'key1': 'value1', 'key2': 'value2'})
-    print(tmp)
     # 最後別忘了關閉
-    logger.close()
+    systemLogger.close()
