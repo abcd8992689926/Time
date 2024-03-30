@@ -1,3 +1,4 @@
+import atexit
 import logging
 import sys
 import time
@@ -14,10 +15,12 @@ from src.generated import line_service_pb2_grpc, line_service_pb2, push_message_
 from file.json import Json
 from factories.message_api import MessageAPI
 from models.config.message_api_config import MessageAPIConfig
+from __init__ import logConfig
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-
+systemLogger = sender.FluentSender('system', host=logConfig.host, port=logConfig.port)
+runtimeLogger = sender.FluentSender('runtime', host=logConfig.host, port=logConfig.port)
 class LineService(line_service_pb2_grpc.LineServiceServicer):
     def __init__(self):
         pass
@@ -25,11 +28,13 @@ class LineService(line_service_pb2_grpc.LineServiceServicer):
     def PushMessage(self, request: push_message_pb2.PushMessageRequest,
                     context) -> push_message_pb2.PushMessageResponse:
         mod_config = Json.load_config_as_model("./config/message_api_config.json", MessageAPIConfig)
-        print(request.text)
-        MessageAPI(mod_config).push_text_message(
+        runtimeLogger.emit('LineService.PushMessage', {'message': 'get request from line service...'})
+        MessageAPI(mod_config, runtimeLogger).push_text_message(
             to=request.to,
             messages=[TextMessage(text=item) for item in request.text]
         )
+        runtimeLogger.emit('LineService.PushMessage', {'message': 'return response status...'})
+        runtimeLogger.close()
         return push_message_pb2.PushMessageResponse(status=True)
 
 
@@ -39,19 +44,15 @@ def run():
     server.add_insecure_port('[::]:50052')
     server.start()
 
-    print("start service...")
+    systemLogger.emit('LineService', {'message': 'start service...'})
     try:
         while True:
             time.sleep(_ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
         server.stop(0)
+    finally:
+        systemLogger.close()
 
 
 if __name__ == '__main__':
-    print(sys.path)
-    from __init__ import systemLogger
-
-    systemLogger.emit('test2', {'key1': 'value1', 'key2': 'value2'})
-    # run()
-    # 最後別忘了關閉
-    systemLogger.close()
+    run()
