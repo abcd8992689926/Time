@@ -1,11 +1,8 @@
-import atexit
-import logging
 import sys
 import time
-from concurrent import futures
-from typing import List
-
 import grpc
+
+from concurrent import futures
 from linebot.v3.messaging import TextMessage
 from fluent import sender
 

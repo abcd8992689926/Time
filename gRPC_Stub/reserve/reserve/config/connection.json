@@ -1,3 +1,0 @@
-{
-  "connectionString": "mssql+pyodbc://felix:test1234@localhost/Time"
-}

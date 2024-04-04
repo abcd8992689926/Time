@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package information;
+
+message ReserveRequest {
+    string user_id = 1;
+    string title = 2;
+    string content = 3;
+};
+
+message ReserveResponse {
+    bool status = 1;
+};
