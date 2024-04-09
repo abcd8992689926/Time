@@ -7,7 +7,8 @@ from linebot.v3.messaging import TextMessage
 from fluent import sender
 
 if __name__ == '__main__':
-    sys.path.append('..\..\gRPC_Server')
+    sys.path.append(r'..\..\gRPC_Server')
+    sys.path.append(r'..\..\Libraries\python_common')
 from src.generated import line_service_pb2_grpc, line_service_pb2, push_message_pb2
 from file.json import Json
 from factories.message_api import MessageAPI

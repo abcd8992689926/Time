@@ -30,5 +30,5 @@ def InformationCentreReserveTest():
 
 
 if __name__ == '__main__':
-    # LinePushMessageTest()
-    InformationCentreReserveTest()
+     LinePushMessageTest()
+    # InformationCentreReserveTest()
