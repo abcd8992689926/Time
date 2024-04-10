@@ -7,3 +7,4 @@ class MessageAPIConfig:
     Push: str
     Multicast: str
     ChannelAccessToken: str
+    ChannelSecret: str

@@ -1,9 +1,12 @@
 import json
+from os import abort
 from typing import List
 
 import linebot.v3.messaging
 from fluent import sender
 from fluent.sender import FluentSender
+from linebot.v3 import WebhookHandler
+from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import TextMessage, Message
 from models.config.message_api_config import MessageAPIConfig
 from file.json import Json
@@ -18,6 +21,7 @@ class MessageAPI:
             access_token=mod_config.ChannelAccessToken
         )
         self._runtimeLogger = runtimeLogger
+        self.handler = WebhookHandler(mod_config.ChannelSecret)
 
     def push_text_message(self, to: str, messages: List[Message]):
         with linebot.v3.messaging.ApiClient(self._configuration) as api_client:
@@ -35,6 +39,22 @@ class MessageAPI:
             except Exception as e:
                 self._runtimeLogger.emit("Line.MessageAPI Exception", e)
 
+    def callback(self, signature: str, body) -> bool:
+        try:
+            self.handler.handle(body, signature)
+        except InvalidSignatureError:
+            self._runtimeLogger.emit("Line.MessageAPI Exception", {
+                "message": "Invalid signature. Please check your channel access token/channel secret."})
+            return False
+
+        return True
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    #echo
+    msg= event.message.text
+    message = TextSendMessage(text=msg)
+    line_bot_api.reply_message(event.reply_token,message)
 
 if __name__ == "__main__":
     mod_config = Json.load_config_as_model("../config/message_api_config.json", MessageAPIConfig)
