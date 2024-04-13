@@ -8,8 +8,15 @@ from fluent.sender import FluentSender
 from linebot.v3 import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import TextMessage, Message
+from linebot.v3.webhooks import MessageEvent, TextMessageContent
+from linebot.v3.messaging import (
+    Configuration,
+    ApiClient,
+    MessagingApi,
+    ReplyMessageRequest,
+    TextMessage
+)
 from models.config.message_api_config import MessageAPIConfig
-from file.json import Json
 
 
 class MessageAPI:
@@ -17,15 +24,28 @@ class MessageAPI:
         self._str_push_url = mod_config.ServerURL + mod_config.Push
         self._str_multicast_url = mod_config.ServerURL + mod_config.Multicast
         self._obj_header = {"Authorization": "Bearer " + mod_config.ChannelAccessToken}
-        self._configuration = linebot.v3.messaging.Configuration(
+        self._configuration = Configuration(
             access_token=mod_config.ChannelAccessToken
         )
         self._runtimeLogger = runtimeLogger
-        self.handler = WebhookHandler(mod_config.ChannelSecret)
+        handler = WebhookHandler(mod_config.ChannelSecret)
+        self._handler = handler
+
+        @handler.add(MessageEvent, message=TextMessageContent)
+        def handle_message(event):
+            print(event.reply_token)
+            with ApiClient(self._configuration) as api_client:
+                api_instance = MessagingApi(api_client)
+                api_instance.reply_message_with_http_info(
+                    ReplyMessageRequest(
+                        reply_token=event.reply_token,
+                        messages=[TextMessage(text=event.message.text)]
+                    )
+                )
 
     def push_text_message(self, to: str, messages: List[Message]):
-        with linebot.v3.messaging.ApiClient(self._configuration) as api_client:
-            api_instance = linebot.v3.messaging.MessagingApi(api_client)
+        with ApiClient(self._configuration) as api_client:
+            api_instance = MessagingApi(api_client)
             messages_request = linebot.v3.messaging.PushMessageRequest(
                 to=to,
                 messages=messages
@@ -41,27 +61,10 @@ class MessageAPI:
 
     def callback(self, signature: str, body) -> bool:
         try:
-            self.handler.handle(body, signature)
+            self._handler.handle(body, signature)
         except InvalidSignatureError:
             self._runtimeLogger.emit("Line.MessageAPI Exception", {
                 "message": "Invalid signature. Please check your channel access token/channel secret."})
             return False
 
         return True
-
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    #echo
-    msg= event.message.text
-    message = TextSendMessage(text=msg)
-    line_bot_api.reply_message(event.reply_token,message)
-
-if __name__ == "__main__":
-    mod_config = Json.load_config_as_model("../config/message_api_config.json", MessageAPIConfig)
-    runtimeLogger = sender.FluentSender('runtime', host="localhost", port=24224)
-    message_api = MessageAPI(mod_config, runtimeLogger)
-    message_api.push_text_message(
-        to="U6cefe412bc8a0fd54cf1d4b3465cba30",
-        messages=[TextMessage(text="testText1")]
-    )
-    runtimeLogger.close()
