@@ -3,7 +3,7 @@ import time
 import grpc
 
 from concurrent import futures
-from linebot.v3.messaging import TextMessage
+from linebot.v3.messaging import TextMessage, PushMessageRequest
 from fluent import sender
 
 if __name__ == '__main__':
@@ -28,8 +28,10 @@ class LineService(line_service_pb2_grpc.LineServiceServicer):
         mod_config = Json.load_config_as_model("./config/message_api_config.json", MessageAPIConfig)
         runtimeLogger.emit('LineService.PushMessage', {'message': 'get request from line service...'})
         MessageAPI(mod_config, runtimeLogger).push_text_message(
-            to=request.to,
-            messages=[TextMessage(text=item) for item in request.text]
+            PushMessageRequest(
+                to=request.to,
+                messages=[TextMessage(text=item) for item in request.text]
+            )
         )
         runtimeLogger.emit('LineService.PushMessage', {'message': 'return response status...'})
         runtimeLogger.close()

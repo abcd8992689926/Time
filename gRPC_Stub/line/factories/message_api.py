@@ -7,7 +7,7 @@ from fluent import sender
 from fluent.sender import FluentSender
 from linebot.v3 import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
-from linebot.v3.messaging import TextMessage, Message
+from linebot.v3.messaging import TextMessage, Message, PushMessageRequest
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
 from linebot.v3.messaging import (
     Configuration,
@@ -28,36 +28,37 @@ class MessageAPI:
             access_token=mod_config.ChannelAccessToken
         )
         self._runtimeLogger = runtimeLogger
-        handler = WebhookHandler(mod_config.ChannelSecret)
-        self._handler = handler
+        self._handler = WebhookHandler(mod_config.ChannelSecret)
 
-        @handler.add(MessageEvent, message=TextMessageContent)
+        @self._handler.add(MessageEvent, message=TextMessageContent)
         def handle_message(event):
-            print(event.reply_token)
-            with ApiClient(self._configuration) as api_client:
-                api_instance = MessagingApi(api_client)
-                api_instance.reply_message_with_http_info(
-                    ReplyMessageRequest(
-                        reply_token=event.reply_token,
-                        messages=[TextMessage(text=event.message.text)]
-                    )
-                )
+            self.reply_message(ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=event.message.text)]
+            ))
 
-    def push_text_message(self, to: str, messages: List[Message]):
+    def push_text_message(self, mod_request: PushMessageRequest):
         with ApiClient(self._configuration) as api_client:
             api_instance = MessagingApi(api_client)
-            messages_request = linebot.v3.messaging.PushMessageRequest(
-                to=to,
-                messages=messages
-            )
             self._runtimeLogger.emit("Line.MessageAPI.push_text_message third_party_request",
-                                     messages_request.to_dict())
+                                     mod_request.to_dict())
             try:
-                response = api_instance.push_message(messages_request)
+                response = api_instance.push_message(mod_request)
                 self._runtimeLogger.emit("Line.MessageAPI.push_text_message third_party_response",
                                          response.to_dict())
             except Exception as e:
-                self._runtimeLogger.emit("Line.MessageAPI Exception", e)
+                self._runtimeLogger.emit("Line.MessageAPI.push_text_message Exception", e)
+
+    def reply_message(self, mod_request: ReplyMessageRequest):
+        with ApiClient(self._configuration) as api_client:
+            api_instance = MessagingApi(api_client)
+            self._runtimeLogger.emit("Line.MessageAPI.reply_message third_party_request",
+                                     mod_request.to_dict())
+            try:
+                api_instance.reply_message_with_http_info(mod_request)
+
+            except Exception as e:
+                self._runtimeLogger.emit("Line.MessageAPI.reply_message Exception", e)
 
     def callback(self, signature: str, body) -> bool:
         try:
