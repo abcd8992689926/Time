@@ -1,8 +1,11 @@
 import json
+import sys
 from os import abort
 from typing import List
 
+import grpc
 import linebot.v3.messaging
+import switch
 from fluent import sender
 from fluent.sender import FluentSender
 from linebot.v3 import WebhookHandler
@@ -19,6 +22,7 @@ from linebot.v3.messaging import (
 from models.config.message_api_config import MessageAPIConfig
 
 
+
 class MessageAPI:
     def __init__(self, mod_config: MessageAPIConfig, runtimeLogger: FluentSender):
         self._str_push_url = mod_config.ServerURL + mod_config.Push
@@ -29,9 +33,19 @@ class MessageAPI:
         )
         self._runtimeLogger = runtimeLogger
         self._handler = WebhookHandler(mod_config.ChannelSecret)
+        self._dictCallbackFunction = {
+            "登記提醒": self.reserve
+        }
 
         @self._handler.add(MessageEvent, message=TextMessageContent)
         def handle_message(event):
+            keywords = event.message.text.split('$')
+            switch
+            if len(keywords) < 2:
+                return
+            print(self._dictCallbackFunction.get(keywords[1]))
+            mod_result = self._dictCallbackFunction.get(keywords[1])()
+            print(event)
             self.reply_message(ReplyMessageRequest(
                 reply_token=event.reply_token,
                 messages=[TextMessage(text=event.message.text)]
@@ -69,3 +83,14 @@ class MessageAPI:
             return False
 
         return True
+
+    def reserve(self, event):
+        channel = grpc.insecure_channel('localhost:50053')
+        stub = information_service_pb2_grpc.InformationServiceStub(channel)
+        response = stub.Reserve(
+            reserve_pb2.ReserveRequest(
+                user_id='test457',
+                title='test title',
+                content='test content'
+            )
+        )

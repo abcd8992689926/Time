@@ -9,7 +9,6 @@ from concurrent import futures
 
 from database.models.future import Future
 from database.repository import Repository
-from linebot.v3.messaging import TextMessage
 from fluent import sender
 
 if __name__ == '__main__':

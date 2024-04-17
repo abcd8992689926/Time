@@ -1,7 +1,13 @@
 import grpc
 
-from src.generated import line_service_pb2_grpc, line_service_pb2, push_message_pb2, information_service_pb2_grpc, \
-    information_service_pb2, reserve_pb2
+from src.generated import (
+    line_service_pb2_grpc,
+    line_service_pb2,
+    push_message_pb2,
+    information_service_pb2_grpc,
+    information_service_pb2,
+    reserve_pb2
+)
 
 
 def LinePushMessageTest():
@@ -30,5 +36,5 @@ def InformationCentreReserveTest():
 
 
 if __name__ == '__main__':
-     LinePushMessageTest()
-    # InformationCentreReserveTest()
+    LinePushMessageTest()
+# InformationCentreReserveTest()
