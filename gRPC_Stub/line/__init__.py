@@ -13,8 +13,3 @@ logConfig = Json.load_config_as_model("config/log_config.json", LogConfig)
 if __name__ == '__main__':
     test = Json.load_config_as_model("config/message_api_config.json", MessageAPIConfig)
     print(test)
-from src.generated import (
-    information_service_pb2_grpc,
-    information_service_pb2,
-    reserve_pb2
-)

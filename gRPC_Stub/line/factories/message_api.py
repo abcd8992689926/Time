@@ -10,17 +10,23 @@ from fluent import sender
 from fluent.sender import FluentSender
 from linebot.v3 import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
-from linebot.v3.messaging import TextMessage, Message, PushMessageRequest
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
 from linebot.v3.messaging import (
     Configuration,
     ApiClient,
     MessagingApi,
     ReplyMessageRequest,
-    TextMessage
+    TextMessage,
+    PushMessageRequest,
+    Message
 )
 from models.config.message_api_config import MessageAPIConfig
-
+sys.path.append(r'..\..\gRPC_Server')
+from src.generated import (
+    information_service_pb2_grpc,
+    information_service_pb2,
+    reserve_pb2
+)
 
 
 class MessageAPI:
@@ -33,23 +39,16 @@ class MessageAPI:
         )
         self._runtimeLogger = runtimeLogger
         self._handler = WebhookHandler(mod_config.ChannelSecret)
-        self._dictCallbackFunction = {
-            "登記提醒": self.reserve
-        }
 
         @self._handler.add(MessageEvent, message=TextMessageContent)
         def handle_message(event):
-            keywords = event.message.text.split('$')
-            switch
-            if len(keywords) < 2:
-                return
-            print(self._dictCallbackFunction.get(keywords[1]))
-            mod_result = self._dictCallbackFunction.get(keywords[1])()
-            print(event)
-            self.reply_message(ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[TextMessage(text=event.message.text)]
-            ))
+            if event.message.text.startswith("/登記提醒"):
+                mod_result = self.reserve(event)
+                print(event)
+                self.reply_message(ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[TextMessage(text=event.message.text)]
+                ))
 
     def push_text_message(self, mod_request: PushMessageRequest):
         with ApiClient(self._configuration) as api_client:
@@ -94,3 +93,4 @@ class MessageAPI:
                 content='test content'
             )
         )
+        return response

@@ -1,18 +1,16 @@
 import json
 import sys
 import time
-from datetime import datetime, timezone
-
 import grpc
-
+from datetime import datetime, timezone
 from concurrent import futures
-
-from database.models.future import Future
-from database.repository import Repository
 from fluent import sender
 
 if __name__ == '__main__':
-    sys.path.append('..\..\gRPC_Server')
+    sys.path.append(r'..\..\Libraries\python_common')
+    sys.path.append(r'..\..\gRPC_Server')
+from database.models.future import Future
+from database.repository import Repository
 from src.generated import information_service_pb2_grpc, information_service_pb2, reserve_pb2
 from __init__ import logConfig
 

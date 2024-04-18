@@ -1,8 +1,8 @@
 import sys
 
 
-sys.path.append('..\..\Libraries\python_common')
-sys.path.append('..\..\gRPC_Server')
+sys.path.append(r'..\..\Libraries\python_common')
+sys.path.append(r'..\..\gRPC_Server')
 
 from file.json import Json
 from log.models.config import LogConfig
