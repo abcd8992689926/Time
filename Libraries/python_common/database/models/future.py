@@ -20,5 +20,5 @@ class Future(Base):
         self.datetime = Datetime
 
     def as_dict(self):
-        excluded_keys = ['id', 'datetime']
+        excluded_keys = ['id']
         return {c.name: getattr(self, c.name) for c in self.__table__.columns if c.name not in excluded_keys}

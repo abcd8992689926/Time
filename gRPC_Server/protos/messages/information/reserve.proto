@@ -6,6 +6,7 @@ message ReserveRequest {
     string user_id = 1;
     string title = 2;
     string content = 3;
+    string datetime = 4;
 };
 
 message ReserveResponse {

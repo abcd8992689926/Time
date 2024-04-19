@@ -36,13 +36,15 @@ class InformationService(information_service_pb2_grpc.InformationServiceServicer
                 user_id=request.user_id,
                 title=request.title,
                 content=request.content,
-                Datetime=datetime.now(timezone.utc)
+                Datetime=request.datetime
             )
             print(mod_request.as_dict())
             runtimeLogger.emit('InformationService.Reserve request', mod_request.as_dict())
             Repository(db_url).add(mod_request)
+            print("success")
             runtimeLogger.emit('InformationService.Reserve', {'message': 'successfully insert data...'})
         except Exception as e:
+            print('InformationService.Reserve Exception', e)
             runtimeLogger.emit('InformationService.Reserve Exception', e)
             result = False
 
