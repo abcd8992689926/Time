@@ -6,8 +6,8 @@ from fluent import sender
 from factories.message_api import MessageAPI
 
 if __name__ == '__main__':
-    print(sys.path)
     sys.path.append(r'..\..\Libraries\python_common')
+    sys.path.append(r'..\..\gRPC_Server')
 
 from file.json import Json
 from models.config.message_api_config import MessageAPIConfig

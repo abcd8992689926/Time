@@ -22,7 +22,7 @@ from linebot.v3.messaging import (
 )
 from models.config.message_api_config import MessageAPIConfig
 
-sys.path.append(r'..\..\gRPC_Server')
+sys.path.append(r'..\..\..\gRPC_Server')
 from src.generated import (
     information_service_pb2_grpc,
     information_service_pb2,
@@ -50,6 +50,9 @@ class MessageAPI:
                     reply_token=event.reply_token,
                     messages=[TextMessage(text=event.message.text)]
                 ))
+
+        with open('config/information_centre_config.json') as f:
+            self.information_centre_config = json.load(f)
 
     def push_text_message(self, mod_request: PushMessageRequest):
         with ApiClient(self._configuration) as api_client:
@@ -85,15 +88,17 @@ class MessageAPI:
         return True
 
     def reserve(self, event):
-        arr_content = event.message.text.split(maxsplit=6)
-        channel = grpc.insecure_channel('localhost:50053')
+        arr_content = event.message.text.split(maxsplit=3)
+        host = self.information_centre_config["host"]
+        port = self.information_centre_config["port"]
+        channel = grpc.insecure_channel(f"{host}:{port}")
         stub = information_service_pb2_grpc.InformationServiceStub(channel)
+        print(arr_content)
         test = reserve_pb2.ReserveRequest(
             user_id=event.source.user_id,
             title=arr_content[1],
-            content=arr_content[4],
-            datetime=arr_content[2] + " " + arr_content[3]
+            content=arr_content[2],
+            datetime=arr_content[3]
         )
-        print(test)
         response = stub.Reserve(test)
         return response
