@@ -1,3 +1,3 @@
 {
-  "connectionString": "mssql+pyodbc://felix:test1234@localhost/Time?driver=ODBC+Driver+17+for+SQL+Server"
+  "connectionString": "mssql+pyodbc://SA:%40Test1234@35.189.178.242:1433/Time?driver=ODBC+Driver+17+for+SQL+Server"
 }

@@ -7,7 +7,7 @@ Base = declarative_base()
 
 class Future(Base):
     __tablename__ = 'future'
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    ID: int = Column(Integer, primary_key=True, autoincrement=True)
     user_id: str = Column(String)
     title: str = Column(String)
     content: str = Column(String)
@@ -20,5 +20,5 @@ class Future(Base):
         self.datetime = Datetime
 
     def as_dict(self):
-        excluded_keys = ['id']
+        excluded_keys = ['ID']
         return {c.name: getattr(self, c.name) for c in self.__table__.columns if c.name not in excluded_keys}

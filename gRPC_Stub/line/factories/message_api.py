@@ -1,12 +1,7 @@
 import json
 import sys
-from os import abort
-from typing import List
-
 import grpc
-import linebot.v3.messaging
-import switch
-from fluent import sender
+
 from fluent.sender import FluentSender
 from linebot.v3 import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
@@ -18,11 +13,10 @@ from linebot.v3.messaging import (
     ReplyMessageRequest,
     TextMessage,
     PushMessageRequest,
-    Message
 )
 from models.config.message_api_config import MessageAPIConfig
 
-sys.path.append(r'..\..\..\gRPC_Server')
+sys.path.append(r'..\..\gRPC_Server')
 from src.generated import (
     information_service_pb2_grpc,
     information_service_pb2,
@@ -87,18 +81,20 @@ class MessageAPI:
 
         return True
 
-    def reserve(self, event):
+    def reserve(self, event) -> bool:
         arr_content = event.message.text.split(maxsplit=3)
         host = self.information_centre_config["host"]
         port = self.information_centre_config["port"]
-        channel = grpc.insecure_channel(f"{host}:{port}")
-        stub = information_service_pb2_grpc.InformationServiceStub(channel)
-        print(arr_content)
-        test = reserve_pb2.ReserveRequest(
-            user_id=event.source.user_id,
-            title=arr_content[1],
-            content=arr_content[2],
-            datetime=arr_content[3]
-        )
-        response = stub.Reserve(test)
-        return response
+        with grpc.secure_channel(
+                f"{host}:{port}", grpc.ssl_channel_credentials(),
+                options=(("grpc.enable_http_proxy", 0),)
+        ) as channel:
+            stub = information_service_pb2_grpc.InformationServiceStub(channel)
+            response = stub.Reserve(reserve_pb2.ReserveRequest(
+                user_id=event.source.user_id,
+                title=arr_content[1],
+                content=arr_content[2],
+                datetime=arr_content[3]
+            )).status
+            print("response:", response)
+            return response

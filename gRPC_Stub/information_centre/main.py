@@ -1,4 +1,6 @@
 import json
+import os
+import signal
 import sys
 import time
 import grpc
@@ -31,6 +33,7 @@ class InformationService(information_service_pb2_grpc.InformationServiceServicer
             config = json.load(f)
         db_url = config['connectionString']
         result = True
+        print("InformationService.Reserve request: ", request)
         try:
             mod_request = Future(
                 user_id=request.user_id,
@@ -38,8 +41,9 @@ class InformationService(information_service_pb2_grpc.InformationServiceServicer
                 content=request.content,
                 Datetime=request.datetime
             )
-            print(mod_request.as_dict())
+            print("mod_request: ", mod_request.as_dict())
             runtimeLogger.emit('InformationService.Reserve request', mod_request.as_dict())
+            print(db_url)
             Repository(db_url).add(mod_request)
             print("success")
             runtimeLogger.emit('InformationService.Reserve', {'message': 'successfully insert data...'})
@@ -48,26 +52,22 @@ class InformationService(information_service_pb2_grpc.InformationServiceServicer
             runtimeLogger.emit('InformationService.Reserve Exception', e)
             result = False
 
+        print('InformationService.Reserve', {'message': 'return response status...'})
         runtimeLogger.emit('InformationService.Reserve', {'message': 'return response status...'})
         runtimeLogger.close()
         return reserve_pb2.ReserveResponse(status=result)
 
 
 def run():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = grpc.server(futures.ThreadPoolExecutor())
     information_service_pb2_grpc.add_InformationServiceServicer_to_server(InformationService(), server)
     server.add_insecure_port('[::]:50053')
+    print("server start...")
     server.start()
 
     systemLogger.emit('InformationService', {'message': 'start service...'})
-    try:
-        while True:
-            time.sleep(_ONE_DAY_IN_SECONDS)
-    except KeyboardInterrupt:
-        server.stop(0)
-    finally:
-        systemLogger.close()
+    server.wait_for_termination()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

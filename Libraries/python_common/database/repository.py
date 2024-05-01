@@ -8,6 +8,10 @@ class Repository:
         self.Session = sessionmaker(bind=engine)
 
     def add(self, obj):
-        with self.Session() as session:
-            session.add(obj)
-            session.commit()
+        print("Repository.add...")
+        try:
+            with self.Session() as session:
+                session.add(obj)
+                session.commit()
+        except Exception as e:
+            print('Repository.add Exception', e)
