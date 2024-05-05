@@ -1,0 +1,28 @@
+FROM python:3.12
+
+# 更新系統並安裝必要的套件
+RUN apt-get update && \
+    apt-get install -y \
+    unixodbc \
+    unixodbc-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 下載並安裝 Microsoft ODBC 驅動程式 17 for SQL Server
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y \
+    msodbcsql17 \
+    && rm -rf /var/lib/apt/lists/*
+ENV PORT=50053
+ENV PYTHONUNBUFFERED 1
+ENV CONNECTION_STRING="mssql+pyodbc://SA:%40Test1234@35.189.178.242:1433/Time?driver=ODBC+Driver+17+for+SQL+Server"
+ENV LOG_HOST="localhost"
+ENV LOG_PORT=2422
+ENV CONNECTION_STRING="mssql+pyodbc://SA:%40Test1234@35.189.178.242:1433/Time?driver=ODBC+Driver+17+for+SQL+Server"
+WORKDIR /app
+COPY gRPC_Server/src/generated /app/src/generated
+COPY Libraries/python_common /app
+COPY gRPC_Stub/information_centre /app
+RUN pip install --no-cache-dir -r requirements.txt
+CMD ["python3", "main.py"]

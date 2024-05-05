@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package line;
+
+message PushMessageRequest {
+    string to = 1;
+    repeated string text = 2;
+};
+
+message PushMessageResponse {
+    bool status = 1;
+};

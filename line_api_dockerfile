@@ -1,0 +1,12 @@
+FROM python:3.12
+ENV PORT=5000
+ENV INFORMATION_CENTRE_HOST="information-centre-2f7cscuapq-de.a.run.app"
+ENV INFORMATION_CENTRE_PORT=443
+ENV LOG_HOST="localhost"
+ENV LOG_PORT=2422
+WORKDIR /app
+COPY gRPC_Server/src/generated /app/src/generated
+COPY Libraries/python_common /app
+COPY gRPC_Stub/line /app
+RUN pip install --no-cache-dir -r requirements.txt
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "API:app"]

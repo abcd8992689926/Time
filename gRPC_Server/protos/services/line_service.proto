@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package services;
+
+import "protos/messages/line/push_message.proto";
+        
+service LineService{
+    rpc PushMessage(line.PushMessageRequest) returns (line.PushMessageResponse) {}
+}

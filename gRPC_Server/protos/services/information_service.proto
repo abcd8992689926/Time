@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package services;
+
+import "protos/messages/information/reserve.proto";
+
+service InformationService{
+    rpc Reserve(information.ReserveRequest) returns (information.ReserveResponse) {}
+}
