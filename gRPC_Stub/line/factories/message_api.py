@@ -1,7 +1,3 @@
-import json
-import sys
-import grpc
-
 from fluent.sender import FluentSender
 from linebot.v3 import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
@@ -14,14 +10,9 @@ from linebot.v3.messaging import (
     TextMessage,
     PushMessageRequest,
 )
-from models.config.message_api_config import MessageAPIConfig
 
-sys.path.append(r'..\..\gRPC_Server')
-from src.generated import (
-    information_service_pb2_grpc,
-    information_service_pb2,
-    reserve_pb2
-)
+from COR.reserve_handler import ReserveHandler
+from models.config.message_api_config import MessageAPIConfig
 
 
 class MessageAPI:
@@ -34,19 +25,16 @@ class MessageAPI:
         )
         self._runtimeLogger = runtimeLogger
         self._handler = WebhookHandler(mod_config.ChannelSecret)
+        self._reserve_handler = ReserveHandler()
 
         @self._handler.add(MessageEvent, message=TextMessageContent)
         def handle_message(event):
-            if event.message.text.startswith("/登記提醒"):
-                mod_result = self.reserve(event)
-                print(event)
+            mod_response = self._reserve_handler.handle_request(event)
+            if mod_response.success:
                 self.reply_message(ReplyMessageRequest(
                     reply_token=event.reply_token,
-                    messages=[TextMessage(text=event.message.text)]
+                    messages=[TextMessage(text=mod_response.reply_message)]
                 ))
-
-        with open('config/information_centre_config.json') as f:
-            self.information_centre_config = json.load(f)
 
     def push_text_message(self, mod_request: PushMessageRequest):
         with ApiClient(self._configuration) as api_client:
@@ -80,21 +68,3 @@ class MessageAPI:
             return False
 
         return True
-
-    def reserve(self, event) -> bool:
-        arr_content = event.message.text.split(maxsplit=3)
-        host = self.information_centre_config["host"]
-        port = self.information_centre_config["port"]
-        with grpc.secure_channel(
-                f"{host}:{port}", grpc.ssl_channel_credentials(),
-                options=(("grpc.enable_http_proxy", 0),)
-        ) as channel:
-            stub = information_service_pb2_grpc.InformationServiceStub(channel)
-            response = stub.Reserve(reserve_pb2.ReserveRequest(
-                user_id=event.source.user_id,
-                title=arr_content[1],
-                content=arr_content[2],
-                datetime=arr_content[3]
-            )).status
-            print("response:", response)
-            return response

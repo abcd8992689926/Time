@@ -1,10 +1,7 @@
 import json
 import os
-import signal
 import sys
-import time
 import grpc
-from datetime import datetime, timezone
 from concurrent import futures
 from fluent import sender
 
@@ -14,9 +11,7 @@ if __name__ == '__main__':
 from database.models.future import Future
 from database.repository import Repository
 from src.generated import information_service_pb2_grpc, information_service_pb2, reserve_pb2
-from __init__ import logConfig
-
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
+from __init__ import logConfig, connection_string
 
 systemLogger = sender.FluentSender('system', host=logConfig.host, port=logConfig.port)
 runtimeLogger = sender.FluentSender('runtime', host=logConfig.host, port=logConfig.port)
@@ -29,9 +24,7 @@ class InformationService(information_service_pb2_grpc.InformationServiceServicer
     def Reserve(self, request: reserve_pb2.ReserveRequest,
                 context) -> reserve_pb2.ReserveResponse:
         runtimeLogger.emit('InformationService.Reserve', {'message': 'get request from information service...'})
-        with open('config/connection.json') as f:
-            config = json.load(f)
-        db_url = config['connectionString']
+        db_url = connection_string
         result = True
         print("InformationService.Reserve request: ", request)
         try:
